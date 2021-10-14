@@ -1,20 +1,22 @@
 from flask import Flask, render_template, request, redirect, session, flash
-'''Aluno: Joao Gabriel Madeira Silva; Data:02/10'''
+'''Aluno: Joao Gabriel Madeira Silva; Data:14/10'''
+
+from dao import JogoDao
+from flask_mysqldb import MySQL
+
+from models import Jogo, Usuario
 
 app = Flask(__name__)
 app.secret_key = 'LP2'
 
-class Jogo:
-    def __init__(self, nome, categoria, console):
-        self._nome=nome
-        self._categoria=categoria
-        self._console=console
+app.config['MYSQL_HOST'] = '127.0.0.1'
+app.config['MYSQL_USER'] = 'root'
+app.config['MYSQL_PASSWORD'] = 'admin'
+app.config['MYSQL_DB'] = 'jogoteca'
+app.config['MYSQL_PORT'] = 3306
+db = MySQL(app)
+jogo_dao = JogoDao(db)
 
-class Usuario:
-    def __init__(self, id, nome, senha):
-        self._id=id
-        self._nome=nome
-        self._senha=senha
 
 
 usuario1 = Usuario('jgms', 'JoaoG', '1223')
@@ -45,7 +47,8 @@ def criar():
     console = request.form['console']
     jogo = Jogo(nome, categoria, console)
 
-    lista.add(jogo)
+    #lista.add(jogo)
+    jogo_dao.salvar(jogo)
     return redirect('/')
     '''return render_template('lista.html', titulo='Lista de Jogos', jogos=lista)'''
 
