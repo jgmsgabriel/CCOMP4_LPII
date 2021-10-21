@@ -1,7 +1,8 @@
 from flask import Flask, render_template, request, redirect, session, flash
-'''Aluno: Joao Gabriel Madeira Silva; Data:14/10'''
+'''Aluno: Joao Gabriel Madeira Silva; Data:21/10'''
+'''GITHUB = https://github.com/jgmsgabriel/CCOMP4_LPII.git'''
 
-from dao import JogoDao
+from dao import JogoDao, UsuarioDao
 from flask_mysqldb import MySQL
 
 from models import Jogo, Usuario
@@ -16,22 +17,12 @@ app.config['MYSQL_DB'] = 'jogoteca'
 app.config['MYSQL_PORT'] = 3306
 db = MySQL(app)
 jogo_dao = JogoDao(db)
+usuario_dao = UsuarioDao(db)
 
-
-
-usuario1 = Usuario('jgms', 'JoaoG', '1223')
-usuario2 = Usuario('joao', 'Joao Gabriel', '123456')
-
-usuarios = {usuario1._id:usuario1, usuario2._id:usuario2}
-
-jogo1 = Jogo('Tetrix', 'Puzzle', 'Super Nintendo')
-jogo2 = Jogo('Super Mario', 'Aventura', 'Nintendo 64')
-jogo3 = Jogo('Sonic', 'Aventura', 'Mega Driver')
-
-lista = {jogo1, jogo2, jogo3}
 
 @app.route('/')
 def index():
+    lista = jogo_dao.listar()
     return render_template('lista.html', titulo='Lista de Jogos', jogos=lista)
 
 @app.route('/novo')
@@ -62,8 +53,8 @@ def login():
 
 @app.route('/autenticar', methods=['POST',])
 def autenticar():
-    if request.form['usuario'] in usuarios:
-        usuario = usuarios[request.form['usuario']]
+    usuario = usuario_dao.buscar_por_id(request.form['usuario'])
+    if usuario:
         if usuario._senha == request.form['senha']:
             session['usuario_logado'] = request.form['usuario']
             flash(request.form['usuario'] + ' logou com sucesso!')
