@@ -5,6 +5,7 @@ SQL_CRIA_JOGO = 'INSERT into jogo (nome, categoria, console) values (%s, %s, %s)
 SQL_ATUALIZA_JOGO = 'UPDATE jogo SET nome=%s, categoria=%s, console=%s where id=%s'
 SQL_BUSCA_JOGOS = 'SELECT id, nome, categoria, console from jogo'
 SQL_USUARIO_POR_ID = 'SELECT id, nome, senha from usuario where id=%s'
+SQL_JOGO_POR_ID = 'SELECT id, nome, categoria, console from jogo where id=%s'
 
 class JogoDao:
     def __init__(self, db):
@@ -27,6 +28,12 @@ class JogoDao:
         cursor.execute(SQL_BUSCA_JOGOS)
         jogos = traduz_jogos(cursor.fetchall())
         return jogos
+
+    def busca_por_id(self, id):
+        cursor = self.__db.connection.cursor()
+        cursor.execute(SQL_JOGO_POR_ID, (id,))
+        tupla = cursor.fetchone()
+        return Jogo(tupla[1], tupla[2], tupla[3], id=tupla[0])
 
 
 def traduz_jogos(jogos):
