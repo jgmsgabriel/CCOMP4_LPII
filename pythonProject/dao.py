@@ -35,6 +35,11 @@ class JogoDao:
         tupla = cursor.fetchone()
         return Jogo(tupla[1], tupla[2], tupla[3], id=tupla[0])
 
+    def deletar(self, id):
+        cursor = self.__db.connection.cursor()
+        cursor.execute(SQL_DELETA_JOGO, (id,))
+        self.__db.connection.commit()
+
 
 def traduz_jogos(jogos):
     def cria_jogo_com_tupla(tupla):

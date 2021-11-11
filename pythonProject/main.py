@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, redirect, session, flash
-'''Aluno: Joao Gabriel Madeira Silva; Data:29/10'''
+'''Aluno: Joao Gabriel Madeira Silva; Data:11/11'''
 '''GITHUB = https://github.com/jgmsgabriel/CCOMP4_LPII.git'''
 
 from dao import JogoDao, UsuarioDao
@@ -22,6 +22,14 @@ usuario_dao = UsuarioDao(db)
 
 @app.route('/')
 def index():
+    if 'usuario_logado' not in session or session['usuario_logado']==None:
+        return redirect('login')
+    return render_template('index.html', titulo='Sistema de Controle de Jogos')
+
+@app.route('/lista_jogos')
+def lista_jogos():
+    if 'usuario_logado' not in session or session['usuario_logado']==None:
+        return redirect('login?proxima=lista_jogos')
     lista = jogo_dao.listar()
     return render_template('lista.html', titulo='Lista de Jogos', jogos=lista)
 
@@ -40,7 +48,7 @@ def criar():
 
     #lista.add(jogo)
     jogo_dao.salvar(jogo)
-    return redirect('/')
+    return redirect('/lista_jogos')
     '''return render_template('lista.html', titulo='Lista de Jogos', jogos=lista)'''
 
 
@@ -60,7 +68,7 @@ def autenticar():
             flash(request.form['usuario'] + ' logou com sucesso!')
             proxima_pagina = request.form['proxima']
             if proxima_pagina == '':
-                return redirect('/')
+                return redirect('/lista_jogos')
             else:
                 return redirect('/{}'.format(proxima_pagina))
 
@@ -86,7 +94,12 @@ def atualizar():
 
     #lista.add(jogo)
     jogo_dao.salvar(jogo)
-    return redirect('/')
+    return redirect('/lista_jogos')
+
+@app.route('/deletar/<int:id>')
+def deletar(id):
+    jogo_dao.deletar(id)
+    return redirect('/lista_jogos')
 
 
 @app.route('/logout')
